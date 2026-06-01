@@ -57,8 +57,15 @@ const Home = () => {
           {t("home.sidenote")}
         </Typography>
         <List>
+          {/**
+           * @symptom   Console: 'Each child in a list should have a unique "key" prop.'
+           * @rootCause issues.map renders sibling <ListItem>s with no key.
+           * @fix       Key each row by its stable, unique title.
+           * @tradeoff  Title is unique here; swap to a dedicated id if titles could ever collide.
+           * @verify    Warning gone; rows reconcile in place instead of remounting.
+           */}
           {issues.map((issue) => (
-            <ListItem>
+            <ListItem key={issue.title}>
               <Typography variant="h5" sx={{ p: 2 }}>
                 {issue.icon}
               </Typography>
