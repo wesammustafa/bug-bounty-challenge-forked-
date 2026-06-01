@@ -34,19 +34,28 @@ const AppHeader = React.forwardRef((props: AppHeaderProps, ref) => {
   const { t } = useTranslation("app");
   const theme = useTheme();
 
-  const [count, setCount] = useState(0);
-  const hours = 1;
-  const minutes = hours * 60;
-  const seconds = minutes * 60;
-  const countdown = seconds - count;
-  const countdownMinutes = `${~~(countdown / 60)}`.padStart(2, "0");
-  const countdownSeconds = (countdown % 60).toFixed(0).padStart(2, "0");
+  const [deadline] = useState(() => Date.now() + 60 * 60 * 1000); // 1h from mount
+  const [remaining, setRemaining] = useState(deadline - Date.now());
 
+  /**
+   * @symptom   Countdown occasionally races/double-ticks, drifts after the tab is backgrounded, then goes negative.
+   * @rootCause Uncleared setInterval stacks on Fast-Refresh/remount; counting ticks drifts vs the wall clock; no zero-stop.
+   * @fix       Derive remaining from a fixed deadline, clean up on unmount, clamp >= 0, and halt at zero.
+   * @tradeoff  250ms tick for a smooth, drift-free display instead of 1000ms; cost is negligible.
+   * @verify    Steady in foreground and after backgrounding; freezes at 00:00; no leaked timers.
+   */
   useEffect(() => {
-    setInterval(() => {
-      setCount((c) => c + 1);
-    }, 1000);
-  }, []);
+    const id = setInterval(() => {
+      const ms = Math.max(0, deadline - Date.now());
+      setRemaining(ms);
+      if (ms === 0) clearInterval(id);
+    }, 250);
+    return () => clearInterval(id);
+  }, [deadline]);
+
+  const totalSeconds = Math.floor(remaining / 1000);
+  const countdownMinutes = `${Math.floor(totalSeconds / 60)}`.padStart(2, "0");
+  const countdownSeconds = `${totalSeconds % 60}`.padStart(2, "0");
 
   return (
     <AppBar ref={ref} position="fixed" sx={{ width: "100vw" }}>
