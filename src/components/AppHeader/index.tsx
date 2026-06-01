@@ -1,4 +1,4 @@
-import { Grow, Box, Theme, Toolbar, Typography } from "@mui/material";
+import { Grow, Box, MenuItem, Select, Theme, Toolbar, Typography } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled, useTheme } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
@@ -31,7 +31,7 @@ const AppBar = styled(MuiAppBar)<AppBarProps>(({ theme }) => ({
 
 const AppHeader = React.forwardRef((props: AppHeaderProps, ref) => {
   const { user, pageTitle } = props;
-  const { t } = useTranslation("app");
+  const { t, i18n } = useTranslation("app");
   const theme = useTheme();
 
   const [deadline] = useState(() => Date.now() + 60 * 60 * 1000); // 1h from mount
@@ -88,7 +88,36 @@ const AppHeader = React.forwardRef((props: AppHeaderProps, ref) => {
               {pageTitle.toLocaleUpperCase()}
             </Typography>
           </Box>
-          <Box sx={{ flex: 1, justifyContent: "flex-end", display: "flex" }}>
+          <Box
+            sx={{
+              flex: 1,
+              justifyContent: "flex-end",
+              alignItems: "center",
+              display: "flex",
+              gap: 1
+            }}
+          >
+            {/**
+              * @symptom   No way to change the UI language.
+              * @rootCause No control exists; i18n is only ever initialised in EN.
+              * @fix       Allow-listed Select calling i18n.changeLanguage("en" | "de").
+              * @tradeoff  Two fixed locales; extend the option list to add more.
+              * @verify    Selecting DE/EN re-renders every i18n string immediately.
+              */}
+            <Select
+              size="small"
+              value={i18n.language?.startsWith("de") ? "de" : "en"}
+              onChange={(e) => i18n.changeLanguage(e.target.value)}
+              sx={{
+                color: "white",
+                ".MuiOutlinedInput-notchedOutline": {
+                  borderColor: "rgba(255,255,255,0.5)"
+                }
+              }}
+            >
+              <MenuItem value="en">EN</MenuItem>
+              <MenuItem value="de">DE</MenuItem>
+            </Select>
             {user && user.eMail && (
               <Grow in={Boolean(user && user.eMail)}>
                 <AvatarMenu user={user} />

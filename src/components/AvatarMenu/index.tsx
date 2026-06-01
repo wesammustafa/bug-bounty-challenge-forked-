@@ -88,13 +88,20 @@ const AvatarMenu = React.forwardRef<HTMLDivElement, AvatarMenuProps>(
             {user.eMail}
           </Typography>
           <Box m={1} />
+          {/**
+            * @symptom   Menu labels stay English after switching language.
+            * @rootCause Buttons render hardcoded literals instead of t().
+            * @fix       Route each label through t() with new app-namespace keys.
+            * @tradeoff  None.
+            * @verify    Labels switch together with the rest of the UI.
+            */}
           <Button
             // onClick={() => history.push(ERoute.SETTINGS_ACCOUNT)}
             variant="outlined"
             color="primary"
             size="medium"
           >
-            Edit Profile
+            {t("editProfile")}
           </Button>
         </Box>
         <Box
@@ -113,7 +120,7 @@ const AvatarMenu = React.forwardRef<HTMLDivElement, AvatarMenuProps>(
           >
             <Icon path={mdiTag} size={0.75} />
             <Box m={0.5} />
-            Edit Organization
+            {t("editOrganization")}
           </Button>
         </Box>
         <Divider />
@@ -136,7 +143,7 @@ const AvatarMenu = React.forwardRef<HTMLDivElement, AvatarMenuProps>(
               textTransform: "none"
             }}
           >
-            Data Privacy Statement
+            {t("dataPrivacy")}
           </Button>
           <Button
             variant="text"
@@ -146,7 +153,7 @@ const AvatarMenu = React.forwardRef<HTMLDivElement, AvatarMenuProps>(
               textTransform: "none"
             }}
           >
-            Imprint
+            {t("imprint")}
           </Button>
         </Box>
       </Menu>
