@@ -40,9 +40,9 @@ const AppHeader = React.forwardRef((props: AppHeaderProps, ref) => {
   /**
    * @symptom   Countdown occasionally races/double-ticks, drifts after the tab is backgrounded, then goes negative.
    * @rootCause Uncleared setInterval stacks on Fast-Refresh/remount; counting ticks drifts vs the wall clock; no zero-stop.
-   * @fix       Derive remaining from a fixed deadline, clean up on unmount, clamp >= 0, and halt at zero.
+   * @fix       Derive remaining from a fixed deadline, clean up on unmount, clamp >= 0, stop at zero, and show a localized end-state.
    * @tradeoff  250ms tick for a smooth, drift-free display instead of 1000ms; cost is negligible.
-   * @verify    Steady in foreground and after backgrounding; freezes at 00:00; no leaked timers.
+   * @verify    Steady in foreground and after backgrounding; shows a localized "time's up" at zero; no leaked timers.
    */
   useEffect(() => {
     const id = setInterval(() => {
@@ -56,14 +56,21 @@ const AppHeader = React.forwardRef((props: AppHeaderProps, ref) => {
   const totalSeconds = Math.floor(remaining / 1000);
   const countdownMinutes = `${Math.floor(totalSeconds / 60)}`.padStart(2, "0");
   const countdownSeconds = `${totalSeconds % 60}`.padStart(2, "0");
+  const isExpired = remaining <= 0;
 
   return (
     <AppBar ref={ref} position="fixed" sx={{ width: "100vw" }}>
       <Toolbar sx={{ background: "#08140C 0% 0% no-repeat padding-box" }}>
         <Box sx={{ width: "100%", flexDirection: "row", display: "flex" }}>
           <Box>
-            <Typography variant="h6" component="div" color="primary">
-              {countdownMinutes}:{countdownSeconds}
+            <Typography
+              variant="h6"
+              component="div"
+              color={isExpired ? "error" : "primary"}
+            >
+              {isExpired
+                ? t("timesUp")
+                : `${countdownMinutes}:${countdownSeconds}`}
             </Typography>
           </Box>
           <Box sx={{ width: 20, height: 20, flex: 1 }} />
