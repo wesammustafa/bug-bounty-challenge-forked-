@@ -12,7 +12,7 @@ export const validateParams = <ERoute extends string>(
   const requiredParams = path
     .split("/")
     .filter((s) => s.startsWith(":"))
-    .map((s) => s.substr(1));
+    .map((s) => s.slice(1));
 
   for (const param of requiredParams) {
     if (!paramSet.has(param)) return false;

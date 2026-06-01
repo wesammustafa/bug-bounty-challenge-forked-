@@ -126,7 +126,7 @@ const AvatarMenu = React.forwardRef<HTMLDivElement, AvatarMenuProps>(
         <Divider />
         <Box display="flex" flexDirection="column" alignItems="center" p={2}>
           <Tooltip title={<Box>{t("logout")}</Box>}>
-            <Button onClick={() => console.log("logout")} variant="text">
+            <Button variant="text">
               <Icon path={mdiLogoutVariant} size={1} />
               <Box m={0.5} />
               {t("logout")}
