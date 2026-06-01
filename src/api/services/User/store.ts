@@ -45,7 +45,14 @@ export default class UserStore {
 
     if (result) {
       runInAction(() => {
-        this.urser = result;
+        /**
+         * @symptom   Avatar never appears although getOwnUser() resolves successfully.
+         * @rootCause `this.urser` typo writes a non-observable field; `user` stays null, the observer stays idle.
+         * @fix       Assign the declared observable `user`; corrected at the source of truth.
+         * @tradeoff  None; one-character fix, no component changes needed.
+         * @verify    Avatar mounts ~500ms after load; observer re-renders on assignment.
+         */
+        this.user = result;
       });
 
       return {
