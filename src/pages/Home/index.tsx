@@ -4,7 +4,7 @@ import React from "react";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 
 const Home = () => {
   const { t } = useTranslation("app");
@@ -51,7 +51,14 @@ const Home = () => {
           {t("home.welcome")}
         </Typography>
         <Typography variant="subtitle1" textAlign="center">
-          {t("home.intro")}{" "}
+          {/**
+           * @symptom   The literal string "<b>known</b>" is shown instead of a bold word.
+           * @rootCause {t("home.intro")} passes the markup to React as a plain string child.
+           * @fix       Render via <Trans> so the existing <b> becomes a real element; en.json untouched.
+           * @tradeoff  Chosen over dangerouslySetInnerHTML, which (with escapeValue:false) is an XSS sink.
+           * @verify    "known" is bold; the i18n source string is unchanged.
+           */}
+          <Trans i18nKey="home.intro" ns="app" components={{ b: <b /> }} />
         </Typography>
         <Typography variant="body2" textAlign="center" color="textSecondary">
           {t("home.sidenote")}
