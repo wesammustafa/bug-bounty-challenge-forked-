@@ -1,7 +1,6 @@
 import { mdiHome } from "@mdi/js";
 import Icon from "@mdi/react";
-import { CircularProgress, Grow } from "@mui/material";
-import { Box } from "@mui/system";
+import { Box, CircularProgress, Grow } from "@mui/material";
 import React, { Suspense } from "react";
 import { ERoute, TRoute } from "../types/global";
 import Home from "./Home";
