@@ -43,8 +43,15 @@ const stringAvatar = (user: User) => {
   };
 };
 
-const AvatarMenu = (props: AvatarMenuProps) => {
-  const { user } = props;
+/**
+ * @symptom   Console: 'Function components cannot be given refs' the moment the avatar renders.
+ * @rootCause <Grow> (AppHeader) clones its child with a ref; AvatarMenu was a plain function component.
+ * @fix       Wrap AvatarMenu in forwardRef; forward the ref + remaining props onto the root <div>.
+ * @tradeoff  None; also lets Grow's transition style actually reach the DOM node.
+ * @verify    Warning gone; avatar grows in smoothly on mount.
+ */
+const AvatarMenu = React.forwardRef<HTMLDivElement, AvatarMenuProps>(
+  ({ user, ...other }, ref) => {
   const theme = useTheme();
   const { t } = useTranslation("app");
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -58,7 +65,7 @@ const AvatarMenu = (props: AvatarMenuProps) => {
   // const history = useHistory();
 
   return (
-    <div>
+    <div ref={ref} {...other}>
       <Avatar onClick={handleClick} {...stringAvatar(user)} />
       <Menu
         id="demo-positioned-menu"
@@ -145,6 +152,7 @@ const AvatarMenu = (props: AvatarMenuProps) => {
       </Menu>
     </div>
   );
-};
+  }
+);
 
 export default AvatarMenu;
